@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: shoppal
+    runtime: node
+    plan: free
+    buildCommand: npm install --omit=dev
+    startCommand: npm start
+    healthCheckPath: /api/config
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: MOCK_MODE
+        value: "false"
+      - key: ANTHROPIC_MODEL
+        value: claude-sonnet-5-5
+      - key: ANTHROPIC_EFFORT
+        value: low
+      - key: PAYPAL_ENV
+        value: sandbox
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: CHANNEL3_API_KEY
+        sync: false
+      - key: PAYPAL_CLIENT_ID
+        sync: false
+      - key: PAYPAL_CLIENT_SECRET
+        sync: false

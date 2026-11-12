@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>ShopPal</title>
+  <meta name="description" content="ShopPal: an AI shopping agent that finds, compares and checks out with PayPal." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛍️</text></svg>" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- Mini bubble (desktop only) -->
+  <button id="bubble" class="bubble" title="Open ShopPal" aria-label="Open ShopPal">🛍️</button>
+
+  <div class="app" id="app">
+    <header class="titlebar">
+      <div class="brand">
+        <span class="logo">🛍️</span>
+        <span class="name">ShopPal</span>
+        <span class="pill sandbox" title="Payments use PayPal sandbox. No real money moves.">Sandbox<span class="sb-long"> demo</span></span>
+        <span class="pill mock" id="mockPill" hidden>Mock data</span>
+      </div>
+      <div class="actions">
+        <button class="icon-btn" id="newChat" title="New chat" aria-label="New chat">
+          <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+        <span class="desktop-only actions">
+          <button class="icon-btn" id="opacityBtn" title="Opacity" aria-label="Toggle opacity">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/></svg>
+          </button>
+          <button class="icon-btn" id="pinBtn" title="Always on top" aria-label="Always on top">
+            <svg viewBox="0 0 24 24"><path d="M9 4h6l-1 6 3 3H7l3-3zM12 13v7"/></svg>
+          </button>
+          <button class="icon-btn" id="modeBtn" title="Expand / compact" aria-label="Toggle window mode">
+            <svg viewBox="0 0 24 24"><path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7"/></svg>
+          </button>
+          <button class="icon-btn" id="bubbleBtn" title="Collapse to bubble" aria-label="Collapse to bubble">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/></svg>
+          </button>
+          <button class="icon-btn" id="closeBtn" title="Hide (Ctrl/Cmd+Shift+Space)" aria-label="Hide">
+            <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>
+          </button>
+        </span>
+      </div>
+    </header>
+
+    <main id="scroller" class="scroller">
+      <section id="welcome" class="welcome">
+        <div class="hero-icon">🛍️</div>
+        <h1>What are you shopping for?</h1>
+        <p>Describe it in your own words. I'll search real stores, compare the best options, and you can check out with PayPal.</p>
+        <div class="chips" id="chips">
+          <button class="chip">Waterproof hiking boots under $120, size 10</button>
+          <button class="chip">A gift for a coffee lover under $50</button>
+          <button class="chip">Mechanical keyboard for coding</button>
+        </div>
+      </section>
+      <div id="messages" class="messages" aria-live="polite"></div>
+    </main>
+
+    <form id="composer" class="composer" autocomplete="off">
+      <textarea id="input" rows="1" placeholder="Ask ShopPal to find something…" aria-label="Message"></textarea>
+      <button id="send" class="send" type="submit" aria-label="Send">
+        <svg viewBox="0 0 24 24"><path d="M5 12h13M13 6l6 6-6 6"/></svg>
+      </button>
+    </form>
+    <div class="footnote" id="footnote">AI can make mistakes. Payments run in PayPal sandbox.</div>
+  </div>
+
+  <!-- Mock PayPal approval dialog (used only when PayPal keys are missing) -->
+  <div id="mockPaypal" class="modal" hidden>
+    <div class="modal-card">
+      <div class="pp-logo"><b>Pay</b><i>Pal</i> <span class="pill sandbox">Sandbox (mock)</span></div>
+      <p>Logged in as <b>sandbox buyer</b></p>
+      <div class="modal-amount" id="mockAmount"></div>
+      <button class="pp-btn" id="mockPay">Complete purchase</button>
+      <button class="link-btn" id="mockCancel">Cancel and return to ShopPal</button>
+    </div>
+  </div>
+
+  <script src="app.js" type="module"></script>
+</body>
+</html>

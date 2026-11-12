@@ -1,0 +1,62 @@
+{
+  "name": "shoppal",
+  "version": "1.0.0",
+  "description": "ShopPal: an AI shopping agent that searches real products, compares them, and checks out with PayPal (sandbox).",
+  "main": "electron/main.cjs",
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch-path=server --env-file-if-exists=.env server/index.js",
+    "start": "node --env-file-if-exists=.env server/index.js",
+    "mock": "node server/index.js --mock",
+    "desktop": "electron .",
+    "package": "electron-builder --mac --win",
+    "package:mac": "electron-builder --mac",
+    "package:win": "electron-builder --win"
+  },
+  "engines": {
+    "node": ">=22.9"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^1.8.0",
+    "express": "^4.21.2"
+  },
+  "devDependencies": {
+    "electron": "^45.3.0",
+    "electron-builder": "^26.18.0"
+  },
+  "author": "ShopPal team",
+  "build": {
+    "appId": "dev.shoppal.desktop",
+    "productName": "ShopPal",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "electron/**/*",
+      "!electron/selftest.cjs",
+      "server/**/*",
+      "public/**/*",
+      "build/icon.png",
+      "package.json"
+    ],
+    "mac": {
+      "target": [
+        "dmg",
+        "zip"
+      ],
+      "category": "public.app-category.shopping",
+      "icon": "build/icon.png"
+    },
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ],
+      "icon": "build/icon.png"
+    },
+    "nsis": {
+      "oneClick": true
+    }
+  }
+}
