@@ -49,7 +49,7 @@ npm install
 ```
 
 ```bash
-cp .env.example .env
+cp -n .env.example .env
 ```
 
 ```bash

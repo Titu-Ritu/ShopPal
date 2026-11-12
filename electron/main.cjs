@@ -80,15 +80,33 @@ function applyMode(mode) {
 }
 
 function applyOnTop(on) {
-  win.setAlwaysOnTop(on, "floating");
-  // Float across desktops/Spaces (and over full-screen apps on macOS) while pinned.
+  // "screen-saver" level is what lets the panel sit above full-screen apps on macOS.
+  win.setAlwaysOnTop(on, on ? "screen-saver" : "normal");
+  // Float across desktops/Spaces (and over full-screen apps) while pinned. On macOS the app runs
+  // as an accessory (no Dock icon, see boot), which is what makes this work across Spaces.
   win.setVisibleOnAllWorkspaces(on, { visibleOnFullScreen: true, skipTransformProcessType: true });
+}
+
+// Show the panel on whichever desktop/Space you're on right now, even when it isn't pinned.
+function showHere() {
+  if (!win.isVisibleOnAllWorkspaces()) {
+    win.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true, skipTransformProcessType: true });
+    win.show();
+    win.focus();
+    setTimeout(() => {
+      const pinned = state.mode === "bubble" || state.alwaysOnTop;
+      if (!pinned) win.setVisibleOnAllWorkspaces(false, { skipTransformProcessType: true });
+    }, 250);
+  } else {
+    win.show();
+    win.focus();
+  }
 }
 
 function toggleVisible() {
   if (!win) return;
   if (win.isVisible() && win.isFocused()) win.hide();
-  else { win.show(); win.focus(); }
+  else showHere();
 }
 
 // ── Window ──
@@ -134,7 +152,8 @@ function createWindow() {
     return { action: "deny" };
   });
   win.webContents.on("did-create-window", (child) => {
-    child.setAlwaysOnTop(true, "pop-up-menu"); // stay above the floating panel
+    child.setAlwaysOnTop(true, "screen-saver", 1); // stay above the floating panel
+    child.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true, skipTransformProcessType: true });
     child.webContents.setWindowOpenHandler(({ url }) => (isPayPal(url) || url === "about:blank" ? { action: "allow" } : (openExternalSafe(url), { action: "deny" })));
   });
   // Never navigate the panel itself away from the app.
@@ -177,7 +196,7 @@ function createTray() {
 function refreshTrayMenu() {
   if (!tray) return;
   tray.setContextMenu(Menu.buildFromTemplate([
-    { label: "Show ShopPal", click: () => { win.show(); win.focus(); } },
+    { label: "Show ShopPal", click: () => showHere() },
     { label: "Hide", click: () => win.hide() },
     { type: "separator" },
     { label: "Always on top", type: "checkbox", checked: state.alwaysOnTop, click: () => togglePin() },
@@ -230,12 +249,18 @@ function loadEnv() {
   }
 }
 
+// The dev self-test gets its own settings folder so it never touches a real running copy.
+if (process.env.SHOPPAL_SELFTEST) app.setPath("userData", path.join(process.env.SHOPPAL_SELFTEST, "userData"));
+
 if (!app.requestSingleInstanceLock()) {
   app.quit();
 } else {
-  app.on("second-instance", () => { if (win) { if (state.mode === "bubble") applyMode(state.lastPanelMode); win.show(); win.focus(); } });
+  app.on("second-instance", () => { if (win) { if (state.mode === "bubble") applyMode(state.lastPanelMode); showHere(); } });
 
   app.whenReady().then(async () => {
+    // Run as a menu-bar accessory on macOS (no Dock icon). Required for the panel to float over
+    // every desktop/Space and full-screen apps. Use the menu bar icon to show, hide or quit.
+    if (process.platform === "darwin" && app.dock) app.dock.hide();
     loadEnv();
     loadState();
     const { startServer } = await import(pathToFileURL(path.join(__dirname, "..", "server", "index.js")).href);
@@ -250,7 +275,7 @@ if (!app.requestSingleInstanceLock()) {
     if (process.env.SHOPPAL_SELFTEST) require("./selftest.cjs")({ win: () => win, applyMode, togglePin, setOpacity, state });
   });
 
-  app.on("activate", () => { if (win) { win.show(); win.focus(); } });
+  app.on("activate", () => { if (win) showHere(); });
   app.on("before-quit", () => { quitting = true; rememberBounds(); try { fs.writeFileSync(statePath(), JSON.stringify(state, null, 2)); } catch {} });
   app.on("will-quit", () => globalShortcut.unregisterAll());
   app.on("window-all-closed", () => { if (process.platform !== "darwin") app.quit(); });

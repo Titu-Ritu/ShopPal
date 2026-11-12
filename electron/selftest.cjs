@@ -20,6 +20,7 @@ module.exports = async function selftest({ win, applyMode, togglePin, setOpacity
     await new Promise((r) => (win().webContents.isLoading() ? win().webContents.once("did-finish-load", r) : r()));
     await wait(800);
     log("desktop bridge:", await js("JSON.stringify({desktop: document.body.classList.contains('desktop'), node: typeof require})"));
+    log("dock hidden:", process.platform === "darwin" ? !app.dock.isVisible() : "n/a", "| on all desktops:", win().isVisibleOnAllWorkspaces());
     if (state.mode !== "compact") applyMode("compact");
     await shot("1-compact-welcome");
 
