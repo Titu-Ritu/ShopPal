@@ -126,5 +126,3 @@ public/        index.html, styles.css, app.js (no build step)
 electron/      main.cjs, preload.cjs, tray icons, selftest.cjs
 build/         app icon for electron-builder
 ```
-
-See [DEMO_SCRIPT.md](DEMO_SCRIPT.md) for the 90-second video script.
